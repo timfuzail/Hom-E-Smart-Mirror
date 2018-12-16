@@ -12,3 +12,6 @@ App Features:
 * News from newsapi.org, Requires API key 
 * Daily Quotes from theysaidso.com/api
 * Dad Jokes from icanhazdadjoke.com
+
+TODO:
+*Add more features
