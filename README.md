@@ -2,6 +2,6 @@
 Android smart mirror app
 
 
-![1](https://cloud.githubusercontent.com/assets/14241502/12705596/848ab1f2-c829-11e5-9c53-58c6569a259a.jpg)
+![1](https://lh3.googleusercontent.com/HkIWD5p6bIvLhU2XNG7KV5_dYylkbBhF6xPP6SiN_VdsajVlJ9LLS7Pk6_gSI-xxjQlh=w1440-h789-rw)
 
 [Available on Play Store](https://play.google.com/store/apps/details?id=timfuzail.homesmartmirror)
