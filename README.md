@@ -14,4 +14,5 @@ App Features:
 * Dad Jokes from icanhazdadjoke.com
 
 TODO:
+* Clean up the code
 * Add more features
