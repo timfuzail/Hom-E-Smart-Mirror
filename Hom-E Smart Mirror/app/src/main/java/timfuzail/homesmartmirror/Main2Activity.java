@@ -3,6 +3,7 @@ package timfuzail.homesmartmirror;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -11,6 +12,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -40,6 +42,8 @@ public class Main2Activity extends AppCompatActivity {
     private String TAG = Main2Activity.class.getSimpleName();
     String News1,News2,News3,News4,News5,News6,Temp,Description,Quote,Author,Sunrise,Sunset,Joke;
     int loop;
+    int GMT;
+    int showJoke;
 
 
             @Override
@@ -49,12 +53,13 @@ public class Main2Activity extends AppCompatActivity {
 
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-                Intent i = getIntent();
-                String darkskykey= i.getStringExtra("darkskyapi");
-                String lat= i.getStringExtra("lat");
-                String lon= i.getStringExtra("lon");
-                String newskey= i.getStringExtra("newsapi");
-                String countrycode= i.getStringExtra("countrycode");
+                SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+                String darkskykey = pref.getString("darkskyapi", null); // getting String
+                String lat= pref.getString("lat", null); // getting String
+                String lon=pref.getString("lon", null); // getting String
+                String newskey=pref.getString("newsapi", null); // getting String
+                String countrycode=pref.getString("countrycode", null); // getting String
+                showJoke = pref.getInt("showjoke",0);
 
                 darkskyapi = "https://api.darksky.net/forecast/" + darkskykey + "/" + lat + "," + lon + "?units=auto&exclude=minutely,hourly,alerts,flags";
                 newsapi = "http://newsapi.org/v2/top-headlines?country=" + countrycode + "&apiKey=" + newskey + "&pagesize=6";
@@ -140,22 +145,23 @@ public class Main2Activity extends AppCompatActivity {
                         }
 
                         if(isNetworkStatusAvialable (getApplicationContext())) {
-                            //Toast.makeText(getApplicationContext(), "Internet detected", Toast.LENGTH_SHORT).show();
-                            StringRequest jokeresponse = new StringRequest(jokeapi, new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String string) {
-                                    GetJoke(string);
-                                }
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError volleyError) {
-                                    Toast.makeText(getApplicationContext(), "Some error occurred!!", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            if (showJoke == 1) {
+                                //Toast.makeText(getApplicationContext(), "Internet detected", Toast.LENGTH_SHORT).show();
+                                StringRequest jokeresponse = new StringRequest(jokeapi, new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String string) {
+                                        GetJoke(string);
+                                    }
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError volleyError) {
+                                        Toast.makeText(getApplicationContext(), "Some error occurred!!", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
 
-                            RequestQueue rQueue = Volley.newRequestQueue(Main2Activity.this);
-                            rQueue.add(jokeresponse);
-
+                                RequestQueue rQueue = Volley.newRequestQueue(Main2Activity.this);
+                                rQueue.add(jokeresponse);
+                            }
                             StringRequest quoteresponse = new StringRequest(quoteapi, new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String string) {
@@ -209,20 +215,22 @@ public class Main2Activity extends AppCompatActivity {
 
                         if(isNetworkStatusAvialable (getApplicationContext())) {
                             //Toast.makeText(getApplicationContext(), "Internet detected", Toast.LENGTH_SHORT).show();
-                            StringRequest jokeresponse = new StringRequest(jokeapi, new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String string) {
-                                    GetJoke(string);
-                                }
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError volleyError) {
-                                    Toast.makeText(getApplicationContext(), "Some error occurred!!", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            if (showJoke == 1) {
+                                StringRequest jokeresponse = new StringRequest(jokeapi, new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String string) {
+                                        GetJoke(string);
+                                    }
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError volleyError) {
+                                        Toast.makeText(getApplicationContext(), "Some error occurred!!", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
 
-                            RequestQueue rQueue = Volley.newRequestQueue(Main2Activity.this);
-                            rQueue.add(jokeresponse);
+                                RequestQueue rQueue = Volley.newRequestQueue(Main2Activity.this);
+                                rQueue.add(jokeresponse);
+                            }
 
                             StringRequest quoteresponse = new StringRequest(quoteapi, new Response.Listener<String>() {
                                 @Override
@@ -257,6 +265,7 @@ public class Main2Activity extends AppCompatActivity {
             JSONObject object = new JSONObject(jsonString);
 
             String main =object.getString("currently");
+            String offset =object.getString("offset");
             JSONObject js2= new JSONObject(main);
             String description = js2.getString("icon");
             Description = description;
@@ -268,6 +277,8 @@ public class Main2Activity extends AppCompatActivity {
             float number = Float.valueOf(temp);
             String s = String.format("%.0f", number);
             Temp = s;
+            float GMTf = Float.valueOf(offset) * 3600;
+            GMT = (int)GMTf;
             String daily = object.getString("daily");
             JSONObject dailyobj = new JSONObject(daily);
             JSONArray contacts = dailyobj.getJSONArray("data");
@@ -294,7 +305,7 @@ public class Main2Activity extends AppCompatActivity {
             WeatherImage.setImageDrawable(drawable );
         }
         int sunr = Integer.parseInt(Sunrise);
-        int t = sunr+19800;         //19800 for +5:30 GMT
+        int t = sunr+GMT;         //19800 for +5:30 GMT
         int d = (t % 86400);
         int h = (d/3600);
         int m = d % 3600;
@@ -308,7 +319,7 @@ public class Main2Activity extends AppCompatActivity {
         }
 
         int suns = Integer.parseInt(Sunset);
-        int t1 = suns+19800;         //19800 for +5:30 GMT
+        int t1 = suns+GMT;         //19800 for +5:30 GMT
         int d1 = (t1 % 86400);
         int h1 = (d1/3600);
         int m10 = d1 % 3600;
@@ -378,6 +389,7 @@ public class Main2Activity extends AppCompatActivity {
             e.printStackTrace();
         }
         TextView joke = (TextView)findViewById(R.id.joke);
+        joke.setVisibility(View.VISIBLE);
         joke.setText(Joke);
     }
 
@@ -454,7 +466,7 @@ public class Main2Activity extends AppCompatActivity {
         String Month = (c.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH ));
         int dayOfMonth = c.get(Calendar.DAY_OF_MONTH);
         String Day = String.valueOf(dayOfMonth);
-        month.setText(Day + " " + Month);
+        month.setText(" " + Day + " " + Month);
     }
     public void setnews(){
         loop = loop+1;

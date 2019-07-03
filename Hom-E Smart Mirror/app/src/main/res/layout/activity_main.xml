@@ -58,7 +58,7 @@
             android:id="@+id/newsapi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="News-Api.org Key"/>
+            android:hint="NewsApi.org Key"/>
 
         <EditText
             android:id="@+id/countrycode"
@@ -68,10 +68,18 @@
 
     </LinearLayout>
 
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/second"
+        android:text="Show Jokes" />
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/second"
+        android:layout_below="@+id/checkBox"
         android:text="Go" />
+
+
 </RelativeLayout>
